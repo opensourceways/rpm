@@ -77,7 +77,7 @@ impl Package {
     }
 
     /// Prepare both header and content digests as used by the `SignatureIndex`.
-    pub(crate) fn create_sig_header_digests(
+    pub fn create_sig_header_digests(
         header: &[u8],
         payload: &[u8],
     ) -> Result<Digests, Error> {

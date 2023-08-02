@@ -18,7 +18,7 @@ impl<T> Header<T>
 where
     T: Tag,
 {
-    pub(crate) fn parse(input: &mut impl io::BufRead) -> Result<Header<T>, Error> {
+    pub fn parse(input: &mut impl io::BufRead) -> Result<Header<T>, Error> {
         let mut buf: [u8; INDEX_HEADER_SIZE as usize] = [0; INDEX_HEADER_SIZE as usize];
         input.read_exact(&mut buf)?;
         let index_header = IndexHeader::parse(&buf)?;
@@ -100,7 +100,7 @@ where
         })
     }
 
-    pub(crate) fn write(&self, out: &mut impl std::io::Write) -> Result<(), Error> {
+    pub fn write(&self, out: &mut impl std::io::Write) -> Result<(), Error> {
         self.index_header.write(out)?;
         for entry in &self.index_entries {
             entry.write_index(out)?;
@@ -329,7 +329,7 @@ impl Header<IndexSignatureTag> {
         SignatureHeaderBuilder::<Empty>::new()
     }
 
-    pub(crate) fn parse_signature(
+    pub fn parse_signature(
         input: &mut impl io::BufRead,
     ) -> Result<Header<IndexSignatureTag>, Error> {
         let result = Self::parse(input)?;
@@ -343,7 +343,7 @@ impl Header<IndexSignatureTag> {
         Ok(result)
     }
 
-    pub(crate) fn write_signature(&self, out: &mut impl std::io::Write) -> Result<(), Error> {
+    pub fn write_signature(&self, out: &mut impl std::io::Write) -> Result<(), Error> {
         self.write(out)?;
         // align to 8 bytes
         let padding_needed = (8 - (self.index_header.data_section_size % 8)) % 8;
