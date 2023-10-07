@@ -537,7 +537,7 @@ impl PackageBuilder {
 
                 let sig_header_and_archive =
                     signer.sign(&mut header_and_content_cursor, signature_timestamp)?;
-                builder.add_rsa_signature(sig_header_only.as_ref(), sig_header_and_archive.as_ref())
+                builder.add_rsa_signature_legacy(sig_header_only.as_ref(), sig_header_and_archive.as_ref())
             }
             signature::AlgorithmType::EdDSA => {
                 builder.add_eddsa_signature(sig_header_only.as_ref())

@@ -114,6 +114,22 @@ impl SignatureHeaderBuilder<WithDigest> {
     pub fn add_rsa_signature(
         mut self,
         sig_header_only: &[u8],
+    ) -> SignatureHeaderBuilder<WithSignature> {
+        let offset = 0i32; // filled externally later on
+        self.entries.push(IndexEntry::new(
+            IndexSignatureTag::RPMSIGTAG_RSA,
+            offset,
+            IndexData::Bin(sig_header_only.to_vec()),
+        ));
+        SignatureHeaderBuilder::<WithSignature> {
+            entries: self.entries,
+            phantom: Default::default(),
+        }
+    }
+
+    pub fn add_rsa_signature_legacy(
+        mut self,
+        sig_header_only: &[u8],
         sig_header_and_archive: &[u8],
     ) -> SignatureHeaderBuilder<WithSignature> {
         let offset = 0i32; // filled externally later on
@@ -171,7 +187,7 @@ mod test {
                 digest_header_sha256.as_str(),
                 &digest_header_and_archive[..],
             )
-            .add_rsa_signature(&sig_header_only[..], &sig_header_and_archive[..])
+            .add_rsa_signature_legacy(&sig_header_only[..], &sig_header_and_archive[..])
             .build(32);
 
         assert!(header
@@ -315,7 +331,7 @@ mod test {
                 digest_header_sha256,
                 digest_header_and_archive,
             )
-            .add_rsa_signature(sig_header_only, sig_header_and_archive)
+            .add_rsa_signature_legacy(sig_header_only, sig_header_and_archive)
             .build(size as usize);
 
         assert_eq!(built, truth);

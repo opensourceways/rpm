@@ -27,11 +27,11 @@ use super::Lead;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Digests {
     /// The sha256 digest of the header.
-    pub(crate) header_digest_sha256: String,
+    pub header_digest_sha256: String,
     /// The sha1 digest of the header.
-    pub(crate) header_digest_sha1: String,
+    pub header_digest_sha1: String,
     /// The sha1 digest of the entire header + payload
-    pub(crate) header_and_content_digest: Vec<u8>,
+    pub header_and_content_digest: Vec<u8>,
 }
 
 /// A complete rpm file.
@@ -164,7 +164,7 @@ impl Package {
 
                 let signature_spanning_header_and_archive =
                     signer.sign(&mut header_and_content_cursor, t)?;
-                builder.add_rsa_signature(
+                builder.add_rsa_signature_legacy(
                     signature_spanning_header_only.as_slice(),
                     signature_spanning_header_and_archive.as_slice(),
                 )
@@ -502,6 +502,12 @@ impl PackageMetadata {
     pub fn get_source_rpm(&self) -> Result<&str, Error> {
         self.header
             .get_entry_data_as_string(IndexTag::RPMTAG_SOURCERPM)
+    }
+
+    /// Whether this package is a source package, or not
+    #[inline]
+    pub fn is_payload_digest_present(&self) -> bool {
+        self.header.entry_is_present(IndexTag::RPMTAG_PAYLOADDIGEST) || self.header.entry_is_present(IndexTag::RPMTAG_PAYLOADDIGESTALT)
     }
 
     fn get_dependencies(
